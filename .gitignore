@@ -1,0 +1,26 @@
+# Compiled source
+/target/
+
+# Build artifacts
+**/*.rs.bk
+
+# Backup files
+*.swp
+*.swo
+*.bak
+*.tmp
+*.old
+
+# IDE / Editor settings
+.vscode/
+.idea/
+*.iml
+
+# OS-specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Cargo-specific
+Cargo.lock
+.cargo/
