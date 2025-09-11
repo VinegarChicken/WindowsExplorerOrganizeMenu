@@ -1,5 +1,5 @@
 [package]
-name = "organize-menu-option"
+name = "file-explorer-organize-plugin"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,9 +7,6 @@ edition = "2021"
 name = "organizer"
 path = "src/main.rs"
 
-[[bin]]
-name = "installer"
-path = "src/installer/main.rs"
 
 [dependencies]
 winapi = { version = "0.3", features = ["winuser", "shellapi", "winreg", "processthreadsapi", "handleapi", "winbase", "std", "errhandlingapi", "securitybaseapi", "winnt"] }
