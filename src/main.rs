@@ -6,8 +6,7 @@ use anyhow::Result;
 mod organizer;
 mod undo;
 
-
-use organizer::{by_type, by_date, by_name};
+use organizer::{by_type, by_date, by_name, by_modified_date, by_size, flatten, remove_duplicates};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -19,7 +18,7 @@ async fn main() -> Result<()> {
                 .short('m')
                 .long("mode")
                 .value_name("MODE")
-                .help("Organization mode: type, date, name, or undo")
+                .help("Organization mode: type, date, modified_date, name, size, flatten, remove_duplicates, or undo")
                 .required(true)
         )
         .arg(
@@ -50,10 +49,14 @@ async fn main() -> Result<()> {
     match mode.as_str() {
         "type" => by_type::organize_by_type(&path).await?,
         "date" => by_date::organize_by_date(&path).await?,
+        "modified_date" => by_modified_date::organize_by_modified_date(&path).await?,
         "name" => by_name::organize_by_name(&path, ranges).await?,
+        "size" => by_size::organize_by_size(&path).await?,
+        "flatten" => flatten::flatten_folder(&path).await?,
+        "remove_duplicates" => remove_duplicates::remove_duplicates(&path).await?,
         "undo" => undo::undo_last_action(&path).await?,
         _ => {
-            eprintln!("Error: Invalid mode. Use: type, date, name, or undo");
+            eprintln!("Error: Invalid mode. Use: type, date, name, size, flatten, remove_duplicates, or undo");
             std::process::exit(1);
         }
     }

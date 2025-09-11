@@ -6,7 +6,6 @@ use winreg::RegKey;
 pub fn create_context_menu_entries(organizer_path: &Path) -> Result<()> {
     println!("Creating context menu entries...");
 
-    // Try multiple registry locations for better compatibility
     let result = try_create_in_hkcr(organizer_path)
         .or_else(|_| try_create_in_hklm(organizer_path))
         .or_else(|_| try_create_in_hkcu(organizer_path));
@@ -79,26 +78,25 @@ fn try_create_in_hkcu(organizer_path: &Path) -> Result<()> {
 fn create_menu_entries(shell_key: &RegKey, organizer_path: &Path) -> Result<()> {
     let organizer_path_str = organizer_path.to_string_lossy().to_string();
 
-    // Create parent "Organize" submenu
     let (parent_key, _) = shell_key.create_subkey_with_flags("OrganizeMenu", KEY_READ | KEY_WRITE)
         .map_err(|e| anyhow::anyhow!("Failed to create OrganizeMenu key: {}", e))?;
 
-    // Displayed submenu name
     parent_key.set_value("MUIVerb", &"Organize")
         .map_err(|e| anyhow::anyhow!("Failed to set MUIVerb for OrganizeMenu: {}", e))?;
 
-    // Tell Windows this is a submenu
     parent_key.set_value("SubCommands", &"")
         .map_err(|e| anyhow::anyhow!("Failed to set SubCommands for OrganizeMenu: {}", e))?;
 
-    // Create "shell" subkey under OrganizeMenu for child commands
     let (submenu_shell, _) = parent_key.create_subkey_with_flags("shell", KEY_READ | KEY_WRITE)
         .map_err(|e| anyhow::anyhow!("Failed to create shell under OrganizeMenu: {}", e))?;
 
-    // Add submenu items
     create_single_entry(&submenu_shell, "OrganizeByType", "Organize by File Type", &organizer_path_str, "type")?;
     create_single_entry(&submenu_shell, "OrganizeByDate", "Organize by Date Created", &organizer_path_str, "date")?;
+    create_single_entry(&submenu_shell, "OrganizeByModifiedDate", "Organize by Date Modified", &organizer_path_str, "modified_date")?;
+    create_single_entry(&submenu_shell, "OrganizeBySize", "Organize by File Size", &organizer_path_str, "size")?;
     create_single_entry(&submenu_shell, "OrganizeByName", "Organize by Name (Alphabetical)", &organizer_path_str, "name")?;
+    create_single_entry(&submenu_shell, "FlattenFolder", "Flatten Folder Structure", &organizer_path_str, "flatten")?;
+    create_single_entry(&submenu_shell, "RemoveDuplicates", "Remove Duplicate Files", &organizer_path_str, "remove_duplicates")?;
     create_single_entry(&submenu_shell, "UndoOrganize", "Undo Last Organization", &organizer_path_str, "undo")?;
 
     println!("✅ Created Organize submenu with child entries");

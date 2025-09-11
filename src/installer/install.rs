@@ -273,7 +273,7 @@ pub fn uninstall_organizer() -> Result<()> {
     }
 
     // Refresh explorer after uninstall too
-    refresh_explorer();
+   // refresh_explorer();
     println!("Refreshed Windows Explorer to remove cached menu entries");
 
     Ok(())

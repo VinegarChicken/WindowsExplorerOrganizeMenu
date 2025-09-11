@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use anyhow::Result;
 use tokio::fs;
 
@@ -20,36 +20,56 @@ pub async fn undo_last_action(folder: &Path) -> Result<()> {
         return Ok(());
     }
 
-    // Get the last action
     let last_action = actions.pop().unwrap();
     println!("Undoing {} operation with {} file moves...", last_action.action_type, last_action.moves.len());
 
     let mut successful_undos = 0;
     let mut failed_undos = 0;
 
-    // Reverse all moves
     for file_move in last_action.moves.iter().rev() {
-        if file_move.to.exists() {
-            match fs::rename(&file_move.to, &file_move.from).await {
+        if last_action.action_type == "flatten" {
+            // Special handling for the flatten operation
+            let relative_path_str = file_move.to.file_name().unwrap().to_string_lossy().replace("___", "\\");
+            let original_path = folder.join(&relative_path_str);
+            let original_dir = original_path.parent().unwrap();
+
+            // Create directories if they don't exist
+            if !original_dir.exists() {
+                if let Err(e) = fs::create_dir_all(&original_dir).await {
+                    eprintln!("Failed to create directory {}: {}", original_dir.display(), e);
+                    failed_undos += 1;
+                    continue;
+                }
+            }
+
+            match fs::rename(&file_move.to, &original_path).await {
                 Ok(()) => successful_undos += 1,
                 Err(e) => {
-                    eprintln!("Failed to move {} back to {}: {}",
-                              file_move.to.display(),
-                              file_move.from.display(),
-                              e);
+                    eprintln!("Failed to move {} back to {}: {}", file_move.to.display(), original_path.display(), e);
                     failed_undos += 1;
                 }
             }
         } else {
-            eprintln!("File not found for undo: {}", file_move.to.display());
-            failed_undos += 1;
+            // Existing undo logic for other operations
+            if file_move.to.exists() {
+                match fs::rename(&file_move.to, &file_move.from).await {
+                    Ok(()) => successful_undos += 1,
+                    Err(e) => {
+                        eprintln!("Failed to move {} back to {}: {}", file_move.to.display(), file_move.from.display(), e);
+                        failed_undos += 1;
+                    }
+                }
+            } else {
+                eprintln!("File not found for undo: {}", file_move.to.display());
+                failed_undos += 1;
+            }
         }
     }
 
-    // Try to remove empty directories created during organization
-    remove_empty_dirs(folder).await;
+    if last_action.action_type != "flatten" {
+        remove_empty_dirs(folder).await;
+    }
 
-    // Update the log file
     if actions.is_empty() {
         let _ = fs::remove_file(&log_path).await;
     } else {
@@ -66,7 +86,6 @@ async fn remove_empty_dirs(folder: &Path) {
         while let Ok(Some(entry)) = entries.next_entry().await {
             let path = entry.path();
             if path.is_dir() && !path.file_name().unwrap().to_string_lossy().starts_with('.') {
-                // Try to remove if empty
                 if let Ok(mut sub_entries) = fs::read_dir(&path).await {
                     if sub_entries.next_entry().await.ok().flatten().is_none() {
                         let _ = fs::remove_dir(&path).await;

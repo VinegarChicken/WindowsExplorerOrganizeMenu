@@ -1,10 +1,7 @@
 use std::env;
 use std::io::{self, Write};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use anyhow::Result;
-use winreg::enums::*;
-use winreg::RegKey;
-
 mod registry;
 mod elevation;
 mod install;
