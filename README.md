@@ -2,7 +2,7 @@
 
 A Windows file organization tool that adds convenient context menu options for organizing folders directly from Windows Explorer.
 
-![Showcase](https://raw.githubusercontent.com/VinegarChicken/WindowsExplorerOrganizeMenu/1967190db6efef1cbb987cbf0ac324a8ce2f14b9/Easily%20Organize%20your%20files.png)
+![Showcase](https://raw.githubusercontent.com/VinegarChicken/WindowsExplorerOrganizeMenu/refs/heads/master/image.png)
 
 ## Features
 
