@@ -2,6 +2,8 @@
 
 A Windows file organization tool that adds convenient context menu options for organizing folders directly from Windows Explorer.
 
+![Showcase](https://raw.githubusercontent.com/VinegarChicken/WindowsExplorerOrganizeMenu/1967190db6efef1cbb987cbf0ac324a8ce2f14b9/Easily%20Organize%20your%20files.png)
+
 ## Features
 
 - **Organize by File Type** - Groups files into folders like Images, Documents, Videos, Audio, etc.
@@ -19,8 +21,8 @@ A Windows file organization tool that adds convenient context menu options for o
 2. Run the installer as Administrator
 3. Choose "Install" from the menu
 4. The installer will:
-   - Copy the organizer to `C:\Program Files\OrganizeMenuOption\`
-   - Add context menu entries to Windows Explorer
+    - Copy the organizer to `C:\Program Files\OrganizeMenuOption\`
+    - Add context menu entries to Windows Explorer
 
 ## Usage
 
